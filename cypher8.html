@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Cypher8</title>
+
+<style>
+:root{
+    --bg:#020617;
+    --card:#0f172a;
+    --accent:#00b9ca;
+    --accent2:#00ae91;
+    --text:#e2e8f0;
+}
+
+body{
+    margin:0;
+    font-family:Arial;
+    background: radial-gradient(circle at top, #0f172a, #000000);
+    color:var(--text);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.container{
+    width:420px;
+    padding:20px;
+    background:rgba(15,23,42,0.92);
+    border-radius:10px;
+    box-shadow:0 0 20px #000;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+textarea{
+    width:100%;
+    height:80px;
+    margin:10px 0;
+    padding:10px;
+    border:none;
+    border-radius:6px;
+    background:#010409;
+    color:white;
+    resize:none;
+
+    box-sizing:border-box;
+}
+
+textarea:focus{
+    outline:2px solid var(--accent2);
+}
+
+button{
+    padding:10px;
+    margin:5px 0;
+    width:100%;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+button:active{
+    transform:scale(0.97);
+}
+
+.encrypt{
+    background:var(--accent);
+}
+
+.decrypt{
+    background:var(--accent2);
+}
+
+.decrypt:disabled{
+    opacity:0.4;
+    cursor:not-allowed;
+}
+
+.key-wrap{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:8px 0;
+    background:#010409;
+    border-radius:6px;
+    padding:0 10px;
+}
+
+.key-wrap label{
+    font-size:12px;
+    color:var(--accent);
+    white-space:nowrap;
+    font-family:'Courier New', monospace;
+    letter-spacing:1px;
+}
+
+.key-wrap input{
+    flex:1;
+    background:transparent;
+    border:none;
+    color:white;
+    padding:10px 0;
+    font-size:14px;
+    outline:none;
+    font-family:'Courier New', monospace;
+}
+
+.key-wrap:focus-within{
+    outline:2px solid var(--accent2);
+    border-radius:6px;
+}
+
+.output{
+    margin-top:10px;
+    padding:10px;
+    background:#010409;
+    border-radius:6px;
+    min-height:40px;
+    word-break:break-all;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+}
+
+.actions button{
+    flex:1;
+}
+
+/* TOAST */
+.toast{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#111;
+    padding:10px 20px;
+    border-radius:6px;
+    opacity:0;
+    transition:0.3s;
+}
+
+.toast.show{
+    opacity:1;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <!-- Logo SVG -->
+    <svg viewBox="0 0 380 72" xmlns="http://www.w3.org/2000/svg" style="width:100%;margin-bottom:10px;display:block;">
+      <defs>
+        <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#00b9ca;stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:#00ae91;stop-opacity:1"/>
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Bracket left -->
+      <text x="18" y="54" font-family="'Courier New', monospace" font-size="48" font-weight="700"
+            fill="url(#logoGrad)" filter="url(#glow)" opacity="0.7">[</text>
+
+      <!-- ᴄʏᴘʜᴇʀ text (small caps unicode) -->
+      <text x="42" y="54" font-family="'Courier New', monospace" font-size="40" font-weight="700"
+            letter-spacing="4" fill="url(#logoGrad)" filter="url(#glow)">ᴄʏᴘʜᴇʀ</text>
+
+      <!-- 8 — aqua claro brillante -->
+      <text x="298" y="54" font-family="'Courier New', monospace" font-size="46" font-weight="900"
+            fill="#7ffcff" filter="url(#glow)">8</text>
+
+      <!-- Bracket right -->
+      <text x="330" y="54" font-family="'Courier New', monospace" font-size="48" font-weight="700"
+            fill="url(#logoGrad)" filter="url(#glow)" opacity="0.7">]</text>
+
+      <!-- Underline bar -->
+      <rect x="42" y="60" width="310" height="2" rx="1" fill="url(#logoGrad)" opacity="0.5"/>
+
+      <!-- Decorative hex bits -->
+      <text x="42" y="72" font-family="'Courier New', monospace" font-size="9"
+            fill="#00b9ca" opacity="0.45" letter-spacing="2">0x43 0x59 0x50 0x48 0x45 0x52 0x38</text>
+    </svg>
+
+    <textarea id="input" placeholder="Enter text here..."></textarea>
+
+    <div class="key-wrap">
+        <label>🔑 KEY</label>
+        <input id="keyInput" type="password" placeholder="Secret key (optional)..." />
+    </div>
+
+    <button class="encrypt" onclick="encrypt()">Encrypt</button>
+    <button id="decryptBtn" class="decrypt" onclick="decrypt()" disabled>Decrypt</button>
+
+    <div id="output" class="output"></div>
+
+    <div class="actions">
+        <button onclick="copy()">Copy</button>
+        <button onclick="clearAll()">Clear</button>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- sonidos -->
+<audio id="clickSound" src="https://www.myinstants.com/media/sounds/click.mp3"></audio>
+<audio id="successSound" src="https://www.myinstants.com/media/sounds/button-3.mp3"></audio>
+
+<script>
+
+// sonidos
+function playClick(){ document.getElementById("clickSound").play(); }
+function playSuccess(){ document.getElementById("successSound").play(); }
+
+// toast
+function showToast(msg){
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+
+    setTimeout(()=> t.classList.remove("show"), 2000);
+}
+
+// validar si parece código Cypher8 (bloques base36 separados por ":")
+function isValidCipher(text){
+    return /^[0-9A-Z]+(:[0-9A-Z]+)+$/i.test(text.trim());
+}
+
+// activar/desactivar botón automáticamente
+document.getElementById("input").addEventListener("input", ()=>{
+    const val = document.getElementById("input").value.trim();
+    document.getElementById("decryptBtn").disabled = !isValidCipher(val);
+});
+
+// Genera offsets a partir de la clave usando sus codepoints
+function getKeyOffsets(key, length){
+    if(!key) return new Array(length).fill(0);
+    let offsets = [];
+    for(let i = 0; i < length; i++){
+        offsets.push(key.codePointAt(i % key.length));
+    }
+    return offsets;
+}
+
+// ENCRIPTAR — Unicode XOR clave → x²+7 → base36
+function encrypt(){
+    playClick();
+
+    let text = document.getElementById("input").value;
+    if(!text){ showToast("No text to encrypt"); return; }
+
+    let key = document.getElementById("keyInput").value;
+    let chars = [...text]; // spread respeta codepoints de emojis
+    let offsets = getKeyOffsets(key, chars.length);
+    let parts = [];
+
+    for(let i = 0; i < chars.length; i++){
+        let code = chars[i].codePointAt(0);
+        let shifted = code ^ offsets[i]; // XOR con offset de clave
+        let transformed = shifted * shifted + 7;
+        parts.push(transformed.toString(36).toUpperCase());
+    }
+
+    document.getElementById("output").textContent = parts.join(":");
+    playSuccess();
+}
+
+// DESENCRIPTAR — base36 → √(x-7) → XOR clave → carácter
+function decrypt(){
+    playClick();
+
+    let text = document.getElementById("input").value.trim();
+
+    if(!isValidCipher(text)){
+        showToast("Invalid Format");
+        return;
+    }
+
+    let key = document.getElementById("keyInput").value;
+
+    try{
+        let parts = text.split(":");
+        let offsets = getKeyOffsets(key, parts.length);
+        let result = "";
+
+        for(let i = 0; i < parts.length; i++){
+            let num = parseInt(parts[i], 36);
+
+            if(isNaN(num)){
+                showToast("Error in the cipher");
+                return;
+            }
+
+            let shifted = Math.round(Math.sqrt(num - 7));
+            let original = shifted ^ offsets[i]; // XOR inverso con clave
+            result += String.fromCodePoint(original);
+        }
+
+        document.getElementById("output").textContent = result;
+        playSuccess();
+
+    }catch{
+        showToast("Error decrypting");
+    }
+}
+
+// COPY
+function copy(){
+    playClick();
+
+    let text = document.getElementById("output").textContent;
+
+    if(!text){
+        showToast("No text for copy");
+        return;
+    }
+
+    navigator.clipboard.writeText(text);
+    showToast("Copied");
+}
+
+// CLEAR
+function clearAll(){
+    playClick();
+
+    document.getElementById("input").value = "";
+    document.getElementById("keyInput").value = "";
+    document.getElementById("output").textContent = "";
+    document.getElementById("decryptBtn").disabled = true;
+
+    showToast("Cleaned");
+}
+
+</script>
+
+</body>
+</html>
