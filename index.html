@@ -169,26 +169,26 @@ button:active{
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
-
+ 
       <!-- Bracket left -->
       <text x="18" y="54" font-family="'Courier New', monospace" font-size="48" font-weight="700"
             fill="url(#logoGrad)" filter="url(#glow)" opacity="0.7">[</text>
-
+ 
       <!-- ᴄʏᴘʜᴇʀ text (small caps unicode) -->
       <text x="42" y="54" font-family="'Courier New', monospace" font-size="40" font-weight="700"
             letter-spacing="4" fill="url(#logoGrad)" filter="url(#glow)">ᴄʏᴘʜᴇʀ</text>
-
+ 
       <!-- 8 — aqua claro brillante -->
       <text x="298" y="54" font-family="'Courier New', monospace" font-size="46" font-weight="900"
             fill="#7ffcff" filter="url(#glow)">8</text>
-
+ 
       <!-- Bracket right -->
       <text x="330" y="54" font-family="'Courier New', monospace" font-size="48" font-weight="700"
             fill="url(#logoGrad)" filter="url(#glow)" opacity="0.7">]</text>
-
+ 
       <!-- Underline bar -->
       <rect x="42" y="60" width="310" height="2" rx="1" fill="url(#logoGrad)" opacity="0.5"/>
-
+ 
       <!-- Decorative hex bits -->
       <text x="42" y="72" font-family="'Courier New', monospace" font-size="9"
             fill="#00b9ca" opacity="0.45" letter-spacing="2">0x43 0x59 0x50 0x48 0x45 0x52 0x38</text>
@@ -210,19 +210,29 @@ button:active{
         <button onclick="copy()">Copy</button>
         <button onclick="clearAll()">Clear</button>
     </div>
+
+    <p style="text-align:center;margin-top:16px;margin-bottom:0;font-size:12px;color:#334155;font-family:'Courier New',monospace;letter-spacing:1px;">created by J88</p>
 </div>
 
 <div id="toast" class="toast"></div>
 
 <!-- sonidos -->
-<audio id="clickSound" src="https://www.myinstants.com/media/sounds/click.mp3"></audio>
-<audio id="successSound" src="https://www.myinstants.com/media/sounds/button-3.mp3"></audio>
+<audio id="clickSound" src="https://www.myinstants.com/media/sounds/click.mp3" volume="0.3"></audio>
+<audio id="successSound" src="https://www.myinstants.com/media/sounds/button-3.mp3" volume="0.3"></audio>
 
 <script>
 
 // sonidos
-function playClick(){ document.getElementById("clickSound").play(); }
-function playSuccess(){ document.getElementById("successSound").play(); }
+function playClick(){
+    const s = document.getElementById("clickSound");
+    s.volume = 0.3;
+    s.play();
+}
+function playSuccess(){
+    const s = document.getElementById("successSound");
+    s.volume = 0.3;
+    s.play();
+}
 
 // toast
 function showToast(msg){
